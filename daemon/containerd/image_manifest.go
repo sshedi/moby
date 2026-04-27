@@ -6,7 +6,6 @@ import (
 
 	"github.com/containerd/containerd"
 	"github.com/containerd/containerd/content"
-	"github.com/containerd/containerd/images"
 	containerdimages "github.com/containerd/containerd/images"
 	"github.com/containerd/containerd/platforms"
 	"github.com/docker/docker/errdefs"
@@ -99,7 +98,7 @@ func (im *ImageManifest) IsPseudoImage(ctx context.Context) (bool, error) {
 		return false, nil
 	}
 	for _, l := range mfst.Layers {
-		if images.IsLayerType(l.MediaType) {
+		if containerdimages.IsLayerType(l.MediaType) {
 			return false, nil
 		}
 	}

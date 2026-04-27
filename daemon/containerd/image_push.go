@@ -9,7 +9,6 @@ import (
 
 	"github.com/containerd/containerd/content"
 	cerrdefs "github.com/containerd/containerd/errdefs"
-	"github.com/containerd/containerd/images"
 	containerdimages "github.com/containerd/containerd/images"
 	containerdlabels "github.com/containerd/containerd/labels"
 	"github.com/containerd/containerd/platforms"
@@ -159,7 +158,7 @@ func (i *ImageService) pushRef(ctx context.Context, targetRef reference.Named, m
 		},
 	)
 
-	handlerWrapper := func(h images.Handler) images.Handler {
+	handlerWrapper := func(h containerdimages.Handler) containerdimages.Handler {
 		return containerdimages.Handlers(addLayerJobs, h)
 	}
 

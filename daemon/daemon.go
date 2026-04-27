@@ -1205,7 +1205,7 @@ func NewDaemon(ctx context.Context, config *config.Config, pluginStore *plugin.S
 		log.G(ctx).Debugf("Max Download Attempts: %d", imgSvcConfig.MaxDownloadAttempts)
 	}
 
-	go d.execCommandGC()
+	go d.execCommandGC() //gosec:disable G118 -- this background goroutine is intended to be scoped to the lifetime of the daemon.
 
 	if err := d.initLibcontainerd(ctx, &cfgStore.Config); err != nil {
 		return nil, err

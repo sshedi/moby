@@ -244,7 +244,7 @@ func (b *Builder) Build(ctx context.Context, opt backend.BuildConfig) (*builder.
 		}
 		j := b.jobs[buildID]
 		var cancel func()
-		ctx, cancel = context.WithCancel(ctx)
+		ctx, cancel = context.WithCancel(ctx) //gosec:disable G118 -- false positive; cancel function is called in a different scope.
 		j.cancel = cancel
 		b.mu.Unlock()
 

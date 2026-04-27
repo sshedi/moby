@@ -194,7 +194,7 @@ func (n *bridgeNetwork) releasePortsInternal(bindings []types.PortBinding) error
 	// Attempt to release all port bindings, do not stop on failure
 	for _, m := range bindings {
 		if err := n.releasePort(m); err != nil {
-			errorBuf.WriteString(fmt.Sprintf("\ncould not release %v because of %v", m, err))
+			fmt.Fprintf(&errorBuf, "\ncould not release %v because of %v", m, err)
 		}
 	}
 

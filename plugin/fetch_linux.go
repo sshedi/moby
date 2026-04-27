@@ -229,7 +229,7 @@ func withFetchProgress(cs content.Store, out progress.Output, ref reference.Name
 
 		key := remotes.MakeRefKey(ctx, desc)
 
-		go func() {
+		go func() { //gosec:disable G118 -- use of background context is intentional.
 			timer := time.NewTimer(100 * time.Millisecond)
 			if !timer.Stop() {
 				<-timer.C

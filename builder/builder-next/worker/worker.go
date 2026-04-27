@@ -328,7 +328,7 @@ func (w *Worker) PruneCacheMounts(ctx context.Context, ids []string) error {
 			}
 			// if ref is unused try to clean it up right away by releasing it
 			if mref, err := w.CacheManager().GetMutable(ctx, md.ID()); err == nil {
-				go mref.Release(context.TODO())
+				go mref.Release(context.TODO()) //gosec:disable G118 -- asynchronous background operation.
 			}
 		}
 	}

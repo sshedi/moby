@@ -73,7 +73,7 @@ type logPluginProxyCapabilitiesResponse struct {
 	Err string
 }
 
-func (pp *logPluginProxy) Capabilities() (cap Capability, err error) {
+func (pp *logPluginProxy) Capabilities() (_ Capability, err error) {
 	var ret logPluginProxyCapabilitiesResponse
 
 	if err = pp.Call("LogDriver.Capabilities", nil, &ret); err != nil {
