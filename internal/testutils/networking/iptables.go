@@ -1,6 +1,7 @@
 package networking
 
 import (
+	"context"
 	"fmt"
 	"os/exec"
 	"regexp"
@@ -9,7 +10,6 @@ import (
 	"time"
 
 	"github.com/docker/docker/testutil/daemon"
-	"golang.org/x/net/context"
 	"gotest.tools/v3/assert"
 	"gotest.tools/v3/icmd"
 	"gotest.tools/v3/poll"
