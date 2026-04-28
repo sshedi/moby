@@ -19,7 +19,6 @@ import (
 	"github.com/containerd/containerd/images"
 	"github.com/containerd/containerd/leases"
 	"github.com/containerd/containerd/platforms"
-	cdreference "github.com/containerd/containerd/reference"
 	ctdreference "github.com/containerd/containerd/reference"
 	"github.com/containerd/containerd/remotes"
 	"github.com/containerd/containerd/remotes/docker"
@@ -41,7 +40,6 @@ import (
 	"github.com/moby/buildkit/source"
 	srctypes "github.com/moby/buildkit/source/types"
 	"github.com/moby/buildkit/sourcepolicy"
-	policy "github.com/moby/buildkit/sourcepolicy/pb"
 	spb "github.com/moby/buildkit/sourcepolicy/pb"
 	"github.com/moby/buildkit/util/flightcontrol"
 	"github.com/moby/buildkit/util/imageutil"
@@ -116,7 +114,7 @@ func (is *Source) resolveRemote(ctx context.Context, ref string, platform *ocisp
 	key := "getconfig::" + ref + "::" + platforms.Format(p)
 	res, err := is.g.Do(ctx, key, func(ctx context.Context) (*resolveRemoteResult, error) {
 		res := resolver.DefaultPool.GetResolver(is.RegistryHosts, ref, "pull", sm, g)
-		ref, dgst, dt, err := imageutil.Config(ctx, ref, res, is.ContentStore, is.LeaseManager, platform, []*policy.Policy{})
+		ref, dgst, dt, err := imageutil.Config(ctx, ref, res, is.ContentStore, is.LeaseManager, platform, []*spb.Policy{})
 		if err != nil {
 			return nil, err
 		}
@@ -862,7 +860,7 @@ func platformMatches(img *image.Image, p *ocispec.Platform) bool {
 }
 
 func applySourcePolicies(ctx context.Context, str string, spls []*spb.Policy) (string, error) {
-	ref, err := cdreference.Parse(str)
+	ref, err := ctdreference.Parse(str)
 	if err != nil {
 		return "", errors.WithStack(err)
 	}
@@ -891,7 +889,7 @@ func applySourcePolicies(ctx context.Context, str string, spls []*spb.Policy) (s
 		if ok && t != srctypes.DockerImageScheme {
 			return "", &imageutil.ResolveToNonImageError{Ref: str, Updated: newRef}
 		}
-		ref, err = cdreference.Parse(newRef)
+		ref, err = ctdreference.Parse(newRef)
 		if err != nil {
 			return "", errors.WithStack(err)
 		}
