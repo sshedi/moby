@@ -53,7 +53,10 @@ func compileAndExecSocketDenied(ctx context.Context, t *testing.T, apiClient cli
 
 	out := strings.ToLower(res.Combined())
 	assert.Check(t, is.Contains(out, "socket"), "expected socket-related error message")
-	assert.Check(t, is.Contains(out, expectedErr), "expected %s, got: %s", expectedErr, res.Combined())
+	// Seccomp returns EPERM ("not permitted"), AppArmor returns EACCES
+	// ("permission denied"). Accept either.
+	denied := strings.Contains(out, "not permitted") || strings.Contains(out, "permission denied")
+	assert.Check(t, denied, "expected EPERM or EACCES, got: %s", res.Combined())
 }
 
 // TestExecSocketDenied verifies that AF_ALG and AF_VSOCK sockets cannot be
