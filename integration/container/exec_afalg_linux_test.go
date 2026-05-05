@@ -3,6 +3,7 @@ package container
 import (
 	"context"
 	_ "embed"
+	"slices"
 	"strings"
 	"testing"
 
@@ -94,6 +95,12 @@ func TestExecSocketDenied(t *testing.T) {
 	// to set the address family and socket type at compile time.
 	t.Run("socketcall_int80", func(t *testing.T) {
 		skip.If(t, !isAmd64, "int $0x80 ia32 compat only available on amd64")
+		// Seccomp cannot filter socketcall arguments (the address family
+		// is behind a userspace pointer). Only an LSM (AppArmor or
+		// SELinux) can deny AF_ALG via the security_socket_create hook.
+		hasLSM := slices.Contains(testEnv.DaemonInfo.SecurityOptions, "name=apparmor") ||
+			slices.Contains(testEnv.DaemonInfo.SecurityOptions, "name=selinux")
+		skip.If(t, !hasLSM, "socketcall filtering requires AppArmor or SELinux")
 
 		srcPath := "/tmp/socketcall.c"
 		res := container.ExecT(ctx, t, apiClient, cID, []string{
@@ -101,9 +108,10 @@ func TestExecSocketDenied(t *testing.T) {
 		})
 		res.AssertSuccess(t)
 
-		// AF_ALG (38) via socketcall must be denied by AppArmor's
-		// "deny network alg" rule, which catches it at the kernel
-		// socket layer even though seccomp cannot filter socketcall args.
+		// AF_ALG (38) via socketcall must be denied by the LSM
+		// (AppArmor's "deny network alg" or SELinux's alg_socket deny),
+		// which catches it at the security_socket_create hook even
+		// though seccomp cannot filter socketcall args.
 		t.Run("AF_ALG", func(t *testing.T) {
 			binPath := "/tmp/socketcall_af_alg"
 			res := container.ExecT(ctx, t, apiClient, cID, append(gcc,
